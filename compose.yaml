@@ -1,0 +1,26 @@
+services:
+  otel_collector:
+    image: otel/opentelemetry-collector-contrib:0.154.0
+    restart: unless-stopped
+    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    ports:
+      - "4317:4317" # OTLP gRPC receiver
+      - "4318:4318" # OTLP HTTP receiver
+      - "8888:8888" # Collector's own Prometheus metrics (self-telemetry)
+      - "8889:8889" # Prometheus exporter metrics (scraped by Prometheus)
+      - "13133:13133" # health_check extension
+    volumes:
+      - ./.docker/otel_collector/config.yaml:/etc/otelcol-contrib/config.yaml:ro
+    networks:
+      - infinite_gambler_net
+    healthcheck:
+      # Requires health_check extension enabled in otel-collector-config.yaml.
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:13133/"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+
+networks:
+  infinite_gambler_net:
+    driver: bridge
