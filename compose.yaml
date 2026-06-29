@@ -6,20 +6,32 @@ services:
     ports:
       - "4317:4317" # OTLP gRPC receiver
       - "4318:4318" # OTLP HTTP receiver
-      - "8888:8888" # Collector's own Prometheus metrics (self-telemetry)
-      - "8889:8889" # Prometheus exporter metrics (scraped by Prometheus)
       - "13133:13133" # health_check extension
     volumes:
       - ./.docker/otel_collector/config.yaml:/etc/otelcol-contrib/config.yaml:ro
     networks:
       - infinite_gambler_net
-    healthcheck:
-      # Requires health_check extension enabled in otel-collector-config.yaml.
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:13133/"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 30s
+
+  loki:
+    image: grafana/loki:3.7.3
+    restart: unless-stopped
+    user: "10001:10001" # Recommended non-root UID
+    command:
+      - -config.file=/etc/loki/loki-config.yaml
+      - -target=all
+    ports:
+      - "3100:3100" # HTTP API + push endpoint
+    volumes:
+      - loki_data:/loki
+      - ./.docker/loki/config.yaml:/etc/loki/loki-config.yaml:ro
+    networks:
+      - infinite_gambler_net
+    depends_on:
+      otel_collector:
+        condition: service_started
+
+volumes:
+  loki_data:
 
 networks:
   infinite_gambler_net:

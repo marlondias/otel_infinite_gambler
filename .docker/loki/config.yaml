@@ -1,0 +1,46 @@
+# Minimal config for development/PoC, with native OTLP support.
+# Pair with: grafana/loki:3.7.3 in monolithic mode (-target=all)
+
+# NOTE: This config was fine-tuned for OpenTelemetry compatibility. Be careful when modifying.
+
+auth_enabled: false # No multi-tenancy; fine for dev.
+
+server:
+  http_listen_port: 3100
+  grpc_listen_port: 9095
+  log_level: warn # Reduce noise in dev.
+
+common:
+  path_prefix: /loki # Root for all data: chunks, index, rules, WAL, compactor.
+  storage:
+    filesystem:
+      chunks_directory: /loki/chunks
+      rules_directory: /loki/rules
+  replication_factor: 1 # Single-node. Do not raise without a distributed setup.
+  ring:
+    kvstore:
+      store: inmemory # No external key-value store (etcd/consul) needed for dev.
+
+schema_config:
+  configs:
+    - from: "2026-06-28"
+      store: tsdb
+      object_store: filesystem
+      schema: v13
+      index:
+        prefix: index_
+        period: 24h
+
+limits_config:
+  allow_structured_metadata: true
+  otlp_config:
+    resource_attributes:
+      attributes_config:
+        - action: index_label
+          attributes:
+            - service.name
+            - service.namespace
+            - deployment.environment
+
+compactor:
+  working_directory: /loki/compactor
