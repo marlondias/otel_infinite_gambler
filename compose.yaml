@@ -6,7 +6,6 @@ services:
     ports:
       - "4317:4317" # OTLP gRPC receiver
       - "4318:4318" # OTLP HTTP receiver
-      - "8889:8889" # Prometheus metrics scrapping
       - "13133:13133" # health_check extension
     volumes:
       - ./.docker/otel_collector/config.yaml:/etc/otelcol-contrib/config.yaml:ro
@@ -37,7 +36,7 @@ services:
       - "--storage.tsdb.retention.time=10d"
       - "--web.enable-lifecycle"
       - "--web.enable-admin-api"
-      - "--enable-feature=otlp-write-receiver"
+      - "--web.enable-otlp-receiver"
     environment:
       - TZ=UTC
     ports:
