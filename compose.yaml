@@ -30,8 +30,32 @@ services:
       otel_collector:
         condition: service_started
 
+  prometheus:
+    image: prom/prometheus:v3.12.0
+    restart: unless-stopped
+    command:
+      - "--config.file=/etc/prometheus/prometheus.yaml"
+      - "--storage.tsdb.path=/prometheus"
+      - "--storage.tsdb.retention.time=10d"
+      - "--web.enable-lifecycle"
+      - "--web.enable-admin-api"
+      - "--enable-feature=otlp-write-receiver"
+    environment:
+      - TZ=UTC
+    ports:
+      - "9090:9090"
+    volumes:
+      - prometheus_data:/prometheus
+      - ./.docker/prometheus/config.yaml:/etc/prometheus/prometheus.yaml:ro
+    networks:
+      - infinite_gambler_net
+    depends_on:
+      otel_collector:
+        condition: service_started
+
 volumes:
   loki_data:
+  prometheus_data:
 
 networks:
   infinite_gambler_net:
