@@ -6,6 +6,7 @@ services:
     ports:
       - "4317:4317" # OTLP gRPC receiver
       - "4318:4318" # OTLP HTTP receiver
+      - "8889:8889" # Prometheus metrics scrapping
       - "13133:13133" # health_check extension
     volumes:
       - ./.docker/otel_collector/config.yaml:/etc/otelcol-contrib/config.yaml:ro
@@ -26,9 +27,6 @@ services:
       - ./.docker/loki/config.yaml:/etc/loki/loki-config.yaml:ro
     networks:
       - infinite_gambler_net
-    depends_on:
-      otel_collector:
-        condition: service_started
 
   prometheus:
     image: prom/prometheus:v3.12.0
@@ -49,13 +47,34 @@ services:
       - ./.docker/prometheus/config.yaml:/etc/prometheus/prometheus.yaml:ro
     networks:
       - infinite_gambler_net
-    depends_on:
-      otel_collector:
-        condition: service_started
+
+  grafana:
+    image: grafana/grafana:13.0.2
+    restart: unless-stopped
+    environment:
+      GF_SECURITY_SECRET_KEY: "NIm7oc3WS30ytU4bBsWawmjSULclfFpn"
+      GF_SECURITY_DISABLE_GRAVATAR: "true"
+      GF_SECURITY_ADMIN_USER: "admin_user"
+      GF_SECURITY_ADMIN_PASSWORD: "admin_password"
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+      GF_AUTH_BASIC_ENABLED: "false"
+      GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_USERS_ALLOW_ORG_CREATE: "false"
+    ports:
+      - "3000:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - grafana_provisioning:/etc/grafana/provisioning
+    networks:
+      - infinite_gambler_net
 
 volumes:
   loki_data:
   prometheus_data:
+  grafana_data:
+  grafana_provisioning:
 
 networks:
   infinite_gambler_net:
