@@ -6,6 +6,7 @@
 auth_enabled: false # No multi-tenancy; fine for dev.
 
 server:
+  http_listen_address: 0.0.0.0
   http_listen_port: 3100
   grpc_listen_port: 9095
   log_level: warn # Reduce noise in dev.
@@ -23,7 +24,7 @@ common:
 
 schema_config:
   configs:
-    - from: "2026-06-28"
+    - from: "2026-06-20"
       store: tsdb
       object_store: filesystem
       schema: v13
