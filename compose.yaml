@@ -4,9 +4,9 @@ services:
     restart: unless-stopped
     command: ["--config=/etc/otelcol-contrib/config.yaml"]
     ports:
-      - "4317:4317" # OTLP gRPC receiver
-      - "4318:4318" # OTLP HTTP receiver
-      - "13133:13133" # health_check extension
+      - "127.0.0.1:4317:4317" # OTLP gRPC receiver
+      - "127.0.0.1:4318:4318" # OTLP HTTP receiver
+      - "127.0.0.1:13133:13133" # health_check extension
     volumes:
       - ./.docker/otel_collector/config.yaml:/etc/otelcol-contrib/config.yaml:ro
     networks:
@@ -20,7 +20,7 @@ services:
       - -config.file=/etc/loki/loki-config.yaml
       - -target=all
     ports:
-      - "3100:3100" # HTTP API + push endpoint
+      - "127.0.0.1:3100:3100" # API + push endpoint
     volumes:
       - loki_data:/loki
       - ./.docker/loki/config.yaml:/etc/loki/loki-config.yaml:ro
@@ -40,7 +40,7 @@ services:
     environment:
       - TZ=UTC
     ports:
-      - "9090:9090"
+      - "127.0.0.1:9090:9090" # Web UI + API
     volumes:
       - prometheus_data:/prometheus
       - ./.docker/prometheus/config.yaml:/etc/prometheus/prometheus.yaml:ro
@@ -62,7 +62,7 @@ services:
       GF_USERS_ALLOW_SIGN_UP: "false"
       GF_USERS_ALLOW_ORG_CREATE: "false"
     ports:
-      - "3000:3000"
+      - "3000:3000" # Web UI + API
     volumes:
       - grafana_data:/var/lib/grafana
       - ./.docker/grafana/provisioning:/etc/grafana/provisioning:ro
