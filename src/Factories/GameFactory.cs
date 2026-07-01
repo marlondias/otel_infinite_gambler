@@ -5,7 +5,7 @@ using InfiniteGambler.Constants;
 using InfiniteGambler.Entities;
 using Microsoft.Extensions.Logging;
 
-public class GameFactory(ILogger<GameFactory> logger, Faker faker)
+public sealed class GameFactory(ILogger<GameFactory> logger, Faker faker)
 {
     private static string[] _gameTypes =
     [

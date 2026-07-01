@@ -5,7 +5,7 @@ using InfiniteGambler.Constants;
 using InfiniteGambler.Entities;
 using Microsoft.Extensions.Logging;
 
-public class PlayerFactory(ILogger<PlayerFactory> logger, Faker faker)
+public sealed class PlayerFactory(ILogger<PlayerFactory> logger, Faker faker)
 {
     private readonly ILogger<PlayerFactory> _logger = logger;
     private readonly Faker _faker = faker;
