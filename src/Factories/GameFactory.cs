@@ -60,15 +60,12 @@ public class GameFactory(ILogger logger, Faker faker)
         var game = new Game
         {
             Name = GenerateRandomName(),
-            BetCost = _faker.Random.Decimal(
-                GameFactoryConstants.MinBetCost,
-                GameFactoryConstants.MaxBetCost
-            ),
+            BetCost = GenerateRandomBetCost(),
             Odds = winningOdds,
             Payout = prize,
         };
 
-        _logger.LogInformation($"A game was created. Name={game.Name} ");
+        _logger.LogInformation($"A game was created. Name={game.Name}.");
 
         return game;
     }
@@ -80,5 +77,16 @@ public class GameFactory(ILogger logger, Faker faker)
         var suffix = _faker.PickRandom(_gameSuffixes);
 
         return $"{color} {type} of {suffix}";
+    }
+
+    private decimal GenerateRandomBetCost()
+    {
+        var betCost = _faker.Random.Decimal(
+            GameFactoryConstants.MinBetCost,
+            GameFactoryConstants.MaxBetCost
+        );
+
+        return Math.Floor(betCost / GameFactoryConstants.BetCostQuantization)
+            * GameFactoryConstants.BetCostQuantization;
     }
 }
