@@ -8,29 +8,32 @@ public class GameFactory(Faker faker)
 {
     private static string[] _gameTypes =
     [
-        "Dice",
-        "Cards",
-        "Wheel",
+        "Ace",
         "Balls",
+        "Bet",
+        "Bingo",
+        "Cards",
+        "Dice",
         "Guess",
+        "Holes",
+        "Jack",
+        "Poker",
         "Roulette",
         "Slots",
-        "Bingo",
-        "Bet",
-        "Poker",
-        "Jack",
         "Ticket",
+        "Wheel",
     ];
     private static string[] _gameSuffixes =
     [
         "Chance",
+        "Champions",
         "Destiny",
         "Enchantment",
         "Fate",
         "Fortune",
         "Glory",
-        "Luck",
         "Legends",
+        "Luck",
         "Prosperity",
         "Rewards",
         "Riches",
@@ -54,8 +57,7 @@ public class GameFactory(Faker faker)
 
         return new Game
         {
-            Name =
-                $"{_faker.Commerce.Color()} {_faker.PickRandom(_gameTypes)} of {_faker.PickRandom(_gameSuffixes)}",
+            Name = GenerateRandomName(),
             BetCost = _faker.Random.Decimal(
                 GameFactoryConstants.MinBetCost,
                 GameFactoryConstants.MaxBetCost
@@ -63,5 +65,14 @@ public class GameFactory(Faker faker)
             Odds = winningOdds,
             Payout = prize,
         };
+    }
+
+    private string GenerateRandomName()
+    {
+        var color = _faker.Commerce.Color();
+        var type = _faker.PickRandom(_gameTypes);
+        var suffix = _faker.PickRandom(_gameSuffixes);
+
+        return $"{color} {type} of {suffix}";
     }
 }
