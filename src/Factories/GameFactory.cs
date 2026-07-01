@@ -3,8 +3,9 @@ namespace InfiniteGambler.Factories;
 using Bogus;
 using InfiniteGambler.Constants;
 using InfiniteGambler.Entities;
+using Microsoft.Extensions.Logging;
 
-public class GameFactory(Faker faker)
+public class GameFactory(ILogger logger, Faker faker)
 {
     private static string[] _gameTypes =
     [
@@ -40,6 +41,7 @@ public class GameFactory(Faker faker)
         "Triumph",
         "Wonders",
     ];
+    private readonly ILogger _logger = logger;
     private readonly Faker _faker = faker;
 
     public Game Create()
@@ -55,7 +57,7 @@ public class GameFactory(Faker faker)
             GameFactoryConstants.MinPrize + (prizeDelta * (decimal)(1d - oddsRatio));
         var prize = _faker.Random.Decimal(minPrizeLowerBound, GameFactoryConstants.MaxPrize);
 
-        return new Game
+        var game = new Game
         {
             Name = GenerateRandomName(),
             BetCost = _faker.Random.Decimal(
@@ -65,6 +67,10 @@ public class GameFactory(Faker faker)
             Odds = winningOdds,
             Payout = prize,
         };
+
+        _logger.LogInformation($"A game was created. Name={game.Name} ");
+
+        return game;
     }
 
     private string GenerateRandomName()
