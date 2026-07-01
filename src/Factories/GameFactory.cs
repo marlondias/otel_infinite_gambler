@@ -46,23 +46,13 @@ public class GameFactory(ILogger logger, Faker faker)
 
     public Game Create()
     {
-        var winningOdds = _faker.Random.Double(
-            GameFactoryConstants.MinWinningOdds,
-            GameFactoryConstants.MaxWinningOdds
-        );
-
-        double oddsRatio = winningOdds / GameFactoryConstants.MaxWinningOdds;
-        decimal prizeDelta = GameFactoryConstants.MaxPrize - GameFactoryConstants.MinPrize;
-        decimal minPrizeLowerBound =
-            GameFactoryConstants.MinPrize + (prizeDelta * (decimal)(1d - oddsRatio));
-        var prize = _faker.Random.Decimal(minPrizeLowerBound, GameFactoryConstants.MaxPrize);
-
+        var odds = GenerateRandomOdds();
         var game = new Game
         {
             Name = GenerateRandomName(),
             BetCost = GenerateRandomBetCost(),
-            Odds = winningOdds,
-            Payout = prize,
+            Odds = GenerateRandomOdds(),
+            Payout = GenerateRandomPayout(odds),
         };
 
         _logger.LogInformation($"A game was created. Name={game.Name}.");
@@ -88,5 +78,25 @@ public class GameFactory(ILogger logger, Faker faker)
 
         return Math.Floor(betCost / GameFactoryConstants.BetCostQuantization)
             * GameFactoryConstants.BetCostQuantization;
+    }
+
+    private double GenerateRandomOdds()
+    {
+        return _faker.Random.Double(
+            GameFactoryConstants.MinWinningOdds,
+            GameFactoryConstants.MaxWinningOdds
+        );
+    }
+
+    private decimal GenerateRandomPayout(double oddsOfWinning)
+    {
+        var oddsRatio = oddsOfWinning / GameFactoryConstants.MaxWinningOdds;
+        var prizeDelta = GameFactoryConstants.MaxPrize - GameFactoryConstants.MinPrize;
+        var minPrizeOffset = prizeDelta * (decimal)(1d - oddsRatio);
+
+        return _faker.Random.Decimal(
+            GameFactoryConstants.MinPrize + minPrizeOffset,
+            GameFactoryConstants.MaxPrize
+        );
     }
 }
