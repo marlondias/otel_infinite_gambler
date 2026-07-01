@@ -3,11 +3,12 @@ namespace InfiniteGambler.Factories;
 using Bogus;
 using InfiniteGambler.Entities;
 
-public class PlayerFactory
+public class PlayerFactory(Faker faker)
 {
-    public static Player Create()
+    private readonly Faker _faker = faker;
+
+    public Player Create()
     {
-        var faker = new Faker();
-        return new Player { Name = faker.Name.FullName() };
+        return new Player { Name = _faker.Name.FullName() };
     }
 }

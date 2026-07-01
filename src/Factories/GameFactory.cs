@@ -4,7 +4,7 @@ using Bogus;
 using InfiniteGambler.Constants;
 using InfiniteGambler.Entities;
 
-public class GameFactory
+public class GameFactory(Faker faker)
 {
     private static string[] _gameTypes = new[]
     {
@@ -37,12 +37,11 @@ public class GameFactory
         "Triumph",
         "Wonders",
     };
+    private readonly Faker _faker = faker;
 
-    public static Game Create()
+    public Game Create()
     {
-        var faker = new Faker();
-
-        var winningOdds = faker.Random.Double(
+        var winningOdds = _faker.Random.Double(
             GameFactoryConstants.MinWinningOdds,
             GameFactoryConstants.MaxWinningOdds
         );
@@ -51,13 +50,13 @@ public class GameFactory
         decimal prizeDelta = GameFactoryConstants.MaxPrize - GameFactoryConstants.MinPrize;
         decimal minPrizeLowerBound =
             GameFactoryConstants.MinPrize + (prizeDelta * (decimal)(1d - oddsRatio));
-        var prize = faker.Random.Decimal(minPrizeLowerBound, GameFactoryConstants.MaxPrize);
+        var prize = _faker.Random.Decimal(minPrizeLowerBound, GameFactoryConstants.MaxPrize);
 
         return new Game
         {
             Name =
-                $"{faker.Commerce.Color()} {faker.PickRandom(_gameTypes)} of {faker.PickRandom(_gameSuffixes)}",
-            BetCost = faker.Random.Decimal(
+                $"{_faker.Commerce.Color()} {_faker.PickRandom(_gameTypes)} of {_faker.PickRandom(_gameSuffixes)}",
+            BetCost = _faker.Random.Decimal(
                 GameFactoryConstants.MinBetCost,
                 GameFactoryConstants.MaxBetCost
             ),
