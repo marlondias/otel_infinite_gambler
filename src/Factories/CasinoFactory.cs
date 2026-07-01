@@ -40,4 +40,9 @@ public sealed class CasinoFactory(
 
         return casino;
     }
+
+    public Casino[] Create(int amount)
+    {
+        return Enumerable.Range(0, amount).Select(i => Create()).ToArray();
+    }
 }
