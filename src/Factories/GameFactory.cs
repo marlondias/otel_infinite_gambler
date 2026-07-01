@@ -6,8 +6,8 @@ using InfiniteGambler.Entities;
 
 public class GameFactory(Faker faker)
 {
-    private static string[] _gameTypes = new[]
-    {
+    private static string[] _gameTypes =
+    [
         "Dice",
         "Cards",
         "Wheel",
@@ -20,9 +20,9 @@ public class GameFactory(Faker faker)
         "Poker",
         "Jack",
         "Ticket",
-    };
-    private static string[] _gameSuffixes = new[]
-    {
+    ];
+    private static string[] _gameSuffixes =
+    [
         "Chance",
         "Destiny",
         "Enchantment",
@@ -36,7 +36,7 @@ public class GameFactory(Faker faker)
         "Riches",
         "Triumph",
         "Wonders",
-    };
+    ];
     private readonly Faker _faker = faker;
 
     public Game Create()
