@@ -6,10 +6,10 @@ using InfiniteGambler.Constants;
 using InfiniteGambler.Entities;
 using Microsoft.Extensions.Logging;
 
-public class CasinoFactory(ILogger logger, Faker faker, GameFactory gameFactory)
+public class CasinoFactory(ILogger<CasinoFactory> logger, Faker faker, GameFactory gameFactory)
 {
     private static string[] _casinoSuffixes = ["Club", "Hall", "Lounge", "Palace"];
-    private readonly ILogger _logger = logger;
+    private readonly ILogger<CasinoFactory> _logger = logger;
     private readonly Faker _faker = faker;
     private readonly GameFactory _gameFactory = gameFactory;
 
