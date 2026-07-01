@@ -1,3 +1,6 @@
 namespace InfiniteGambler.Config;
 
-public record ApplicationConfig(int AmountOfCasinos);
+public sealed class ApplicationConfig
+{
+    public required int AmountOfCasinos { get; init; }
+}

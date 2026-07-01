@@ -1,9 +1,14 @@
 namespace InfiniteGambler.Config;
 
-public record OpenTelemetryCollectorConfig(string Endpoint, bool UseGrpc);
+public sealed class OpenTelemetryCollectorConfig
+{
+    public required string Endpoint { get; init; }
+    public required bool UseGrpc { get; init; }
+}
 
-public record OpenTelemetryConfig(
-    string ServiceName,
-    int MetricsExportIntervalInMS,
-    OpenTelemetryCollectorConfig Collector
-);
+public sealed class OpenTelemetryConfig
+{
+    public required string ServiceName { get; init; }
+    public required int MetricsExportIntervalInMS { get; init; }
+    public required OpenTelemetryCollectorConfig Collector { get; init; }
+}
