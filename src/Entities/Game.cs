@@ -6,4 +6,10 @@ public class Game
     public required double Odds { get; init; }
     public required decimal BetCost { get; init; }
     public required decimal Payout { get; init; }
+    public int BetsCount { get; private set; }
+    public int WinnersCount { get; private set; }
+
+    public void IncrementBetsCount() => BetsCount++;
+
+    public void IncrementWinnersCount() => WinnersCount++;
 }
