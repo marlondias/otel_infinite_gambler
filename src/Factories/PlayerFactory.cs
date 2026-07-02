@@ -23,4 +23,9 @@ public sealed class PlayerFactory(ILogger<PlayerFactory> logger, Faker faker)
 
         return player;
     }
+
+    public Player[] Create(int amount)
+    {
+        return Enumerable.Range(0, amount).Select(i => Create()).ToArray();
+    }
 }
