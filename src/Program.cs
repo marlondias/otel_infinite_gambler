@@ -1,36 +1,42 @@
-﻿using System.Diagnostics.Metrics;
+﻿using Bogus;
+using InfiniteGambler;
 using InfiniteGambler.Config;
+using InfiniteGambler.Factories;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
-using OpenTelemetry;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 
-// Load configuration from appsettings.json
 var configuration = new ConfigurationBuilder()
+    .SetBasePath(AppContext.BaseDirectory)
     .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
     .Build();
 
+// Set reusable values for setting up OpenTelemetry
 var oTelConfig = configuration.GetRequiredSection("OpenTelemetry").Get<OpenTelemetryConfig>();
 if (oTelConfig is null)
+{
     throw new InvalidOperationException("OpenTelemetry configuration is invalid.");
-
-// Set reusable values for setting up OpenTelemetry
+}
 var oTelResourceBuilder = ResourceBuilder.CreateDefault().AddService(oTelConfig.ServiceName);
 var oTelCollectorUri = new Uri(oTelConfig.Collector.Endpoint);
 var oTelCollectorProtocol = oTelConfig.Collector.UseGrpc
     ? OtlpExportProtocol.Grpc
     : OtlpExportProtocol.HttpProtobuf;
 
-var loggerFactory = LoggerFactory.Create(builder =>
+var services = new ServiceCollection();
+services.Configure<ApplicationConfig>(configuration.GetRequiredSection("Application"));
+
+services.AddLogging(builder =>
 {
     builder.AddOpenTelemetry(logging =>
     {
-        logging.SetResourceBuilder(oTelResourceBuilder);
         logging.IncludeFormattedMessage = true;
         logging.IncludeScopes = true;
+        logging.SetResourceBuilder(oTelResourceBuilder);
         logging.AddOtlpExporter(options =>
         {
             options.Protocol = oTelCollectorProtocol;
@@ -39,39 +45,17 @@ var loggerFactory = LoggerFactory.Create(builder =>
     });
 });
 
-var meterProvider = Sdk.CreateMeterProviderBuilder()
-    .SetResourceBuilder(oTelResourceBuilder)
-    .AddOtlpExporter(
-        (exporterOptions, readerOptions) =>
-        {
-            exporterOptions.Protocol = oTelCollectorProtocol;
-            exporterOptions.Endpoint = oTelCollectorUri;
-            readerOptions.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds =
-                oTelConfig.MetricsExportIntervalInMS;
-        }
-    )
-    .AddMeter(oTelConfig.ServiceName)
-    .Build();
+services.AddSingleton<Faker>();
+services.AddTransient<PlayerFactory>();
+services.AddTransient<GameFactory>();
+services.AddTransient<CasinoFactory>();
+services.AddTransient<SimulationLauncher>();
 
-// =====
-
-var logger = loggerFactory.CreateLogger(oTelConfig.ServiceName);
-
-var meter = new Meter(oTelConfig.ServiceName);
-var loopCounter = meter.CreateCounter<long>(
-    "example.loop.iterations",
-    description: "Total iteration in main loop."
+using var serviceProvider = services.BuildServiceProvider(
+    new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true }
 );
 
-long iteration = 0;
-while (iteration++ < long.MaxValue)
-{
-    logger.LogInformation($"Loop iteration {iteration} started.");
-    loopCounter.Add(1);
-    await Task.Delay(100);
-}
+var simulation = serviceProvider.GetRequiredService<SimulationLauncher>();
+simulation.Run();
 
-meterProvider.Dispose();
-loggerFactory.Dispose();
-
-// var appConfig = configuration.GetSection("Application").Get<ApplicationConfig>();
+Console.WriteLine("Program finished. Check Grafana for details.");
