@@ -1,7 +1,7 @@
-﻿using InfiniteGambler;
-using InfiniteGambler.Config;
+﻿using InfiniteGambler.Config;
 using InfiniteGambler.Factories;
 using InfiniteGambler.Instrumentation;
+using InfiniteGambler.Simulation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
