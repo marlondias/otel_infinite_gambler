@@ -1,61 +1,65 @@
-﻿using Bogus;
-using InfiniteGambler;
+﻿using InfiniteGambler;
 using InfiniteGambler.Config;
 using InfiniteGambler.Factories;
+using InfiniteGambler.Instrumentation;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using OpenTelemetry.Exporter;
 using OpenTelemetry.Logs;
 using OpenTelemetry.Metrics;
 using OpenTelemetry.Resources;
 
-var configuration = new ConfigurationBuilder()
-    .SetBasePath(AppContext.BaseDirectory)
-    .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-    .Build();
+var builder = Host.CreateApplicationBuilder(args);
 
-// Set reusable values for setting up OpenTelemetry
-var oTelConfig = configuration.GetRequiredSection("OpenTelemetry").Get<OpenTelemetryConfig>();
-if (oTelConfig is null)
-{
-    throw new InvalidOperationException("OpenTelemetry configuration is invalid.");
-}
-var oTelResourceBuilder = ResourceBuilder.CreateDefault().AddService(oTelConfig.ServiceName);
+builder.Services.Configure<ApplicationConfig>(
+    builder.Configuration.GetRequiredSection("Application")
+);
+
+var oTelConfig =
+    builder.Configuration.GetRequiredSection("OpenTelemetry").Get<OpenTelemetryConfig>()
+    ?? throw new InvalidOperationException("OpenTelemetry configuration is invalid.");
+
 var oTelCollectorUri = new Uri(oTelConfig.Collector.Endpoint);
 var oTelCollectorProtocol = oTelConfig.Collector.UseGrpc
     ? OtlpExportProtocol.Grpc
     : OtlpExportProtocol.HttpProtobuf;
 
-var services = new ServiceCollection();
-services.Configure<ApplicationConfig>(configuration.GetRequiredSection("Application"));
-
-services.AddLogging(builder =>
-{
-    builder.AddOpenTelemetry(logging =>
+builder
+    .Services.AddOpenTelemetry()
+    .ConfigureResource(r => r.AddService(oTelConfig.ServiceName))
+    .WithLogging(logging =>
     {
-        logging.IncludeFormattedMessage = true;
-        logging.IncludeScopes = true;
-        logging.SetResourceBuilder(oTelResourceBuilder);
-        logging.AddOtlpExporter(options =>
+        //logging.IncludeFormattedMessage = true;
+        //logging.IncludeScopes = true;
+        logging.AddOtlpExporter(o =>
         {
-            options.Protocol = oTelCollectorProtocol;
-            options.Endpoint = oTelCollectorUri;
+            o.Protocol = oTelCollectorProtocol;
+            o.Endpoint = oTelCollectorUri;
+        });
+    })
+    .WithMetrics(metrics =>
+    {
+        metrics.AddMeter(Instrumentation.MeterName);
+        metrics.AddOtlpExporter(o =>
+        {
+            o.Protocol = oTelCollectorProtocol;
+            o.Endpoint = oTelCollectorUri;
         });
     });
-});
 
-services.AddSingleton<Faker>();
-services.AddTransient<PlayerFactory>();
-services.AddTransient<GameFactory>();
-services.AddTransient<CasinoFactory>();
-services.AddTransient<SimulationLauncher>();
+builder.Services.AddSingleton<Bogus.Faker>();
+builder.Services.AddSingleton<SimulationMetrics>();
 
-using var serviceProvider = services.BuildServiceProvider(
-    new ServiceProviderOptions { ValidateScopes = true, ValidateOnBuild = true }
-);
+builder.Services.AddTransient<PlayerFactory>();
+builder.Services.AddTransient<GameFactory>();
+builder.Services.AddTransient<CasinoFactory>();
+builder.Services.AddTransient<SimulationLauncher>();
 
-var simulation = serviceProvider.GetRequiredService<SimulationLauncher>();
+using var host = builder.Build();
+
+var simulation = host.Services.GetRequiredService<SimulationLauncher>();
 simulation.Run();
 
-Console.WriteLine("Program finished. Check Grafana for details.");
+Console.WriteLine("Simulation completed. Check Grafana for details.");
