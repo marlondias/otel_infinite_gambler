@@ -24,12 +24,12 @@ public class SimulationLauncher(
     {
         try
         {
-            _metrics.SimulationStarted();
-            _logger.LogInformation("Simulation started.");
-            var sw = Stopwatch.StartNew();
-
             var player = _playerFactory.Create();
             var casinos = _casinoFactory.Create(10);
+
+            _logger.LogInformation("Simulation started.");
+            _metrics.SimulationStarted();
+            var sw = Stopwatch.StartNew();
 
             _metrics.SimulationCompleted(sw.Elapsed.TotalMilliseconds);
             _logger.LogInformation("Simulation ended.");

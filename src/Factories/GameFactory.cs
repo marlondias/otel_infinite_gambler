@@ -1,5 +1,6 @@
 namespace InfiniteGambler.Factories;
 
+using System.Globalization;
 using Bogus;
 using InfiniteGambler.Constants;
 using InfiniteGambler.Entities;
@@ -55,14 +56,19 @@ public sealed class GameFactory(ILogger<GameFactory> logger, Faker faker)
             Payout = GenerateRandomPayout(odds),
         };
 
-        _logger.LogInformation($"A game was created. Name={game.Name}.");
+        _logger.LogDebug($"A game was created. Name={game.Name} Payout={game.Payout}.");
 
         return game;
     }
 
+    public Game[] Create(int amount)
+    {
+        return Enumerable.Range(0, amount).Select(i => Create()).ToArray();
+    }
+
     private string GenerateRandomName()
     {
-        var color = _faker.Commerce.Color();
+        var color = CultureInfo.CurrentCulture.TextInfo.ToTitleCase(_faker.Commerce.Color());
         var type = _faker.PickRandom(_gameTypes);
         var suffix = _faker.PickRandom(_gameSuffixes);
 
