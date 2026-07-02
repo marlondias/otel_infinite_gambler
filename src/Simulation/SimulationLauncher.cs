@@ -52,7 +52,7 @@ public class SimulationLauncher : BackgroundService
                                 casinoIndex,
                                 gameIndex,
                                 game.BetCost,
-                                game.Payout,
+                                game.Prize,
                                 game.Odds
                             )
                     )

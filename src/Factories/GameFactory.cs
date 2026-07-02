@@ -53,10 +53,10 @@ public sealed class GameFactory(ILogger<GameFactory> logger, Faker faker)
             Name = GenerateRandomName(),
             BetCost = GenerateRandomBetCost(),
             Odds = odds,
-            Payout = GenerateRandomPayout(odds),
+            Prize = GenerateRandomPrize(odds),
         };
 
-        _logger.LogDebug($"A game was created. Name={game.Name} Payout={game.Payout}.");
+        _logger.LogDebug($"A game was created. Name={game.Name} Prize={game.Prize}.");
 
         return game;
     }
@@ -94,7 +94,7 @@ public sealed class GameFactory(ILogger<GameFactory> logger, Faker faker)
         );
     }
 
-    private decimal GenerateRandomPayout(double oddsOfWinning)
+    private decimal GenerateRandomPrize(double oddsOfWinning)
     {
         var oddsRatio = oddsOfWinning / GameFactoryConstants.MaxWinningOdds;
         var prizeDelta = GameFactoryConstants.MaxPrize - GameFactoryConstants.MinPrize;

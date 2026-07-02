@@ -8,7 +8,7 @@ public class Casino
     public required ImmutableArray<Game> Games { get; init; }
     public decimal PurchasePrice
     {
-        get => Games.Max(g => g.Payout) * 1.5m;
+        get => Games.Max(g => g.Prize) * 1.5m;
     }
     public decimal MoneyReceivedInBets { get; private set; }
     public decimal MoneyGivenInPrizes { get; private set; }
@@ -38,8 +38,8 @@ public class Casino
         if (isWinner)
         {
             Games[gameIndex].IncrementWinnersCount();
-            MoneyGivenInPrizes += Games[gameIndex].Payout;
-            player.AddCashBalance(Games[gameIndex].Payout);
+            MoneyGivenInPrizes += Games[gameIndex].Prize;
+            player.AddCashBalance(Games[gameIndex].Prize);
         }
     }
 }
