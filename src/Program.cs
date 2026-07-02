@@ -50,16 +50,14 @@ builder
     });
 
 builder.Services.AddSingleton<Bogus.Faker>();
+builder.Services.AddSingleton<PlayerFactory>();
+builder.Services.AddSingleton<GameFactory>();
+builder.Services.AddSingleton<CasinoFactory>();
 builder.Services.AddSingleton<SimulationMetrics>();
 
-builder.Services.AddTransient<PlayerFactory>();
-builder.Services.AddTransient<GameFactory>();
-builder.Services.AddTransient<CasinoFactory>();
-builder.Services.AddTransient<SimulationLauncher>();
+builder.Services.AddHostedService<SimulationLauncher>();
 
 using var host = builder.Build();
-
-var simulation = host.Services.GetRequiredService<SimulationLauncher>();
-simulation.Run();
+await host.RunAsync();
 
 Console.WriteLine("Simulation completed. Check Grafana for details.");
