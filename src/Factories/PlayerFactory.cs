@@ -13,8 +13,13 @@ public sealed class PlayerFactory(ILogger<PlayerFactory> logger, Faker faker)
     public Player Create()
     {
         var player = new Player { Name = _faker.Name.FullName() };
-        var minInitialCash = GameFactoryConstants.MaxBetCost * 1000;
-        var initialCash = Math.Round(_faker.Random.Decimal(minInitialCash, minInitialCash * 1000));
+
+        var initialCash = Math.Round(
+            _faker.Random.Decimal(
+                PlayerFactoryConstants.MinInitialCash,
+                PlayerFactoryConstants.MaxInitialCash
+            )
+        );
         player.AddCashBalance(initialCash);
 
         _logger.LogDebug(
