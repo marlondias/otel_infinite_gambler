@@ -52,7 +52,7 @@ public sealed class GameFactory(ILogger<GameFactory> logger, Faker faker)
         {
             Name = GenerateRandomName(),
             BetCost = GenerateRandomBetCost(),
-            Odds = GenerateRandomOdds(),
+            Odds = odds,
             Payout = GenerateRandomPayout(odds),
         };
 
