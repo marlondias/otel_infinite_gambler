@@ -18,6 +18,7 @@ public class SimulationLauncher : BackgroundService
     private readonly SimulationMetrics _metrics;
     private readonly ImmutableArray<Casino> _casinos;
     private readonly ImmutableArray<Player> _players;
+    private readonly ImmutableArray<GameSummary> _gameSummaries;
     private readonly int _indexOfCheapestCasino;
     private readonly decimal _bettingCostOfCheapestGame;
 
@@ -42,7 +43,23 @@ public class SimulationLauncher : BackgroundService
             .First()
             .index;
 
-        _bettingCostOfCheapestGame = _casinos.SelectMany(c => c.Games).Min(g => g.BetCost);
+        _gameSummaries = _casinos
+            .SelectMany(
+                (casino, casinoIndex) =>
+                    casino.Games.Select(
+                        (game, gameIndex) =>
+                            new GameSummary(
+                                casinoIndex,
+                                gameIndex,
+                                game.BetCost,
+                                game.Payout,
+                                game.Odds
+                            )
+                    )
+            )
+            .ToImmutableArray();
+
+        _bettingCostOfCheapestGame = _gameSummaries.Min(s => s.BetCost);
     }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
@@ -140,34 +157,18 @@ public class SimulationLauncher : BackgroundService
     {
         foreach (var player in _players.Where(p => p.CashBalance >= _bettingCostOfCheapestGame))
         {
-            var topSummary = GetAffordableGameSummaries(player)
-                .OrderByDescending(s => s.ReturnOnInvestment * (decimal)s.Odds)
-                .First();
+            var summaries = _gameSummaries
+                .Where(s => s.BetCost <= player.CashBalance)
+                .OrderByDescending(s => s.Odds);
 
-            _casinos[topSummary.CasinoIndex].PlayGame(topSummary.GameIndex, player);
-            _metrics.SpinsPlayed(1);
+            foreach (var s in summaries)
+            {
+                if (s.BetCost > player.CashBalance)
+                    continue;
+
+                _casinos[s.CasinoIndex].PlayGame(s.GameIndex, player);
+                _metrics.SpinsPlayed(1);
+            }
         }
-    }
-
-    private AffordableGameSummary[] GetAffordableGameSummaries(Player player)
-    {
-        return _casinos
-            .SelectMany(
-                (casino, casinoIndex) =>
-                    casino
-                        .GetIndexesOfGamesWithinBudget(player.CashBalance)
-                        .Select(gameIndex =>
-                        {
-                            var game = casino.Games[gameIndex];
-                            return new AffordableGameSummary(
-                                casinoIndex,
-                                gameIndex,
-                                game.Odds,
-                                (game.Payout - game.BetCost) / game.BetCost
-                            );
-                        })
-                        .ToArray()
-            )
-            .ToArray();
     }
 }
