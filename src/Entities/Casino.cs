@@ -10,4 +10,9 @@ public class Casino
     {
         get => Games.Max(g => g.Payout) * 1.5m;
     }
+
+    public int[] GetIndexesOfGamesWithinBudget(decimal budget)
+    {
+        return Games.Index().Where(x => x.Item.BetCost <= budget).Select(x => x.Index).ToArray();
+    }
 }
