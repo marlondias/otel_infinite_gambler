@@ -9,6 +9,7 @@ public sealed class OpenTelemetryCollectorConfig
 public sealed class OpenTelemetryConfig
 {
     public required string ServiceName { get; init; }
+    public required string ServiceInstanceId { get; init; }
     public required int MetricsExportIntervalInMS { get; init; }
     public required OpenTelemetryCollectorConfig Collector { get; init; }
 }

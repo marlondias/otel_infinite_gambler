@@ -1,4 +1,4 @@
-﻿using InfiniteGambler.Config;
+using InfiniteGambler.Config;
 using InfiniteGambler.Factories;
 using InfiniteGambler.Instrumentation;
 using InfiniteGambler.Simulation;
@@ -28,7 +28,13 @@ var oTelCollectorProtocol = oTelConfig.Collector.UseGrpc
 
 builder
     .Services.AddOpenTelemetry()
-    .ConfigureResource(r => r.AddService(oTelConfig.ServiceName))
+    .ConfigureResource(r =>
+        r.AddService(
+            serviceName: oTelConfig.ServiceName,
+            autoGenerateServiceInstanceId: false,
+            serviceInstanceId: oTelConfig.ServiceInstanceId
+        )
+    )
     .WithLogging(logging =>
     {
         //logging.IncludeFormattedMessage = true;
