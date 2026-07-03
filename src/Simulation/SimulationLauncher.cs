@@ -19,8 +19,10 @@ public class SimulationLauncher : BackgroundService
     private readonly ImmutableArray<Casino> _casinos;
     private readonly ImmutableArray<Player> _players;
     private readonly ImmutableArray<GameSummary> _gameSummaries;
+    private readonly int _amountOfGames;
     private readonly int _indexOfCheapestCasino;
     private readonly decimal _bettingCostOfCheapestGame;
+    private long _gamblingRounds;
 
     public SimulationLauncher(
         IHostApplicationLifetime lifetime,
@@ -36,6 +38,7 @@ public class SimulationLauncher : BackgroundService
         _metrics = metrics;
         _casinos = casinoFactory.Create(appConfig.Value.AmountOfCasinos).ToImmutableArray();
         _players = playerFactory.Create(appConfig.Value.AmountOfPlayers).ToImmutableArray();
+        _amountOfGames = _casinos.Sum(c => c.Games.Length);
 
         _indexOfCheapestCasino = _casinos
             .Select((casino, index) => (casino, index))
@@ -60,22 +63,36 @@ public class SimulationLauncher : BackgroundService
             .ToImmutableArray();
 
         _bettingCostOfCheapestGame = _gameSummaries.Min(s => s.BetCost);
+
+        _logger.LogInformation(
+            $"Simulation created with {_players.Length} players, {_casinos.Length} casinos and {_amountOfGames} games."
+        );
+        _logger.LogDebug(
+            $"Cheapest casino is worth ${_casinos[_indexOfCheapestCasino].PurchasePrice}."
+        );
+        _logger.LogDebug($"Cheapest game costs ${_bettingCostOfCheapestGame} per bet.");
     }
 
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         try
         {
-            _logger.LogInformation("Simulation started.");
-            _metrics.SimulationStarted();
-            var sw = Stopwatch.StartNew();
+            _metrics.SimulationCreated(
+                _amountOfGames,
+                _bettingCostOfCheapestGame,
+                _casinos[_indexOfCheapestCasino].PurchasePrice
+            );
 
+            _metrics.SimulationStarted();
+            _logger.LogInformation("Simulation started.");
             ShowPlayersRanking();
 
+            var sw = Stopwatch.StartNew();
             while (!CanSomePlayerBuyACasino() && CanSomePlayerBet())
             {
                 RunGamblingRound();
             }
+            sw.Stop();
 
             if (CanSomePlayerBuyACasino())
                 ShowMessageForCasinoPurchased();
@@ -85,8 +102,16 @@ public class SimulationLauncher : BackgroundService
 
             ShowPlayersRanking();
 
-            _metrics.SimulationCompleted(sw.Elapsed.TotalMilliseconds);
-            _logger.LogInformation("Simulation ended.");
+            var totalBetsPlaced = _casinos.Sum(c => c.Games.Sum(g => g.BetsCount));
+            var totalBetsWon = _casinos.Sum(c => c.Games.Sum(g => g.WinnersCount));
+            _metrics.SimulationCompleted(
+                sw.Elapsed.TotalMilliseconds,
+                _gamblingRounds,
+                totalBetsPlaced,
+                totalBetsWon
+            );
+            _logger.LogInformation($"Simulation completed after {_gamblingRounds} rounds.");
+
             return Task.CompletedTask;
         }
         finally
@@ -167,8 +192,8 @@ public class SimulationLauncher : BackgroundService
                     continue;
 
                 _casinos[s.CasinoIndex].PlayGame(s.GameIndex, player);
-                _metrics.SpinsPlayed(1);
             }
         }
+        _gamblingRounds++;
     }
 }
