@@ -13,11 +13,6 @@ public class Casino
     public decimal MoneyReceivedInBets { get; private set; }
     public decimal MoneyGivenInPrizes { get; private set; }
 
-    public int[] GetIndexesOfGamesWithinBudget(decimal budget)
-    {
-        return Games.Index().Where(x => x.Item.BetCost <= budget).Select(x => x.Index).ToArray();
-    }
-
     public void PlayGame(int gameIndex, Player player)
     {
         if (gameIndex < 0 || gameIndex > Games.Length)
