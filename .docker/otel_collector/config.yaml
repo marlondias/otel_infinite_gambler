@@ -24,11 +24,11 @@ processors:
     send_batch_size: 1024
 
 exporters:
-  otlphttp/loki:
+  otlp_http/loki:
     endpoint: "http://loki:3100/otlp"
     tls:
       insecure: true
-  otlphttp/prometheus:
+  otlp_http/prometheus:
     endpoint: "http://prometheus:9090/api/v1/otlp"
     tls:
       insecure: true
@@ -45,8 +45,8 @@ service:
     metrics:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [otlphttp/prometheus]
+      exporters: [otlp_http/prometheus]
     logs:
       receivers: [otlp]
       processors: [memory_limiter, batch]
-      exporters: [otlphttp/loki]
+      exporters: [otlp_http/loki]
