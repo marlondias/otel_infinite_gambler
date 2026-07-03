@@ -20,4 +20,9 @@ public class Player
 
         CashBalance -= amount;
     }
+
+    public override string ToString()
+    {
+        return $"Player.Name=\"{Name}\" Player.CashBalance={Math.Round(CashBalance, 2)}";
+    }
 }

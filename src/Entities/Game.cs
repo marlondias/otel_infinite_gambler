@@ -12,4 +12,17 @@ public class Game
     public void IncrementBetsCount() => BetsCount++;
 
     public void IncrementWinnersCount() => WinnersCount++;
+
+    public override string ToString()
+    {
+        return string.Join(
+            ' ',
+            [
+                $"Game.Name=\"{Name}\"",
+                $"Game.Odds={Odds}",
+                $"Game.BetCost={Math.Round(BetCost, 2)}",
+                $"Game.Prize={Math.Round(Prize, 2)}",
+            ]
+        );
+    }
 }

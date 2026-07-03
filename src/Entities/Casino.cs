@@ -37,4 +37,18 @@ public class Casino
             player.AddCashBalance(Games[gameIndex].Prize);
         }
     }
+
+    public override string ToString()
+    {
+        return string.Join(
+            ' ',
+            [
+                $"Casino.Name=\"{Name}\"",
+                $"Casino.GamesCount={Games.Length}",
+                $"Casino.PurchasePrice={Math.Round(PurchasePrice, 2)}",
+                $"Casino.MoneyReceivedInBets={Math.Round(MoneyReceivedInBets, 2)}",
+                $"Casino.MoneyGivenInPrizes={Math.Round(MoneyGivenInPrizes, 2)}",
+            ]
+        );
+    }
 }
