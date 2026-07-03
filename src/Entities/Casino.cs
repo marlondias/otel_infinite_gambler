@@ -8,7 +8,7 @@ public class Casino
     public required ImmutableArray<Game> Games { get; init; }
     public decimal PurchasePrice
     {
-        get => Games.Max(g => g.Prize) * 1.5m;
+        get => Math.Round(Games.Sum(g => g.Prize) * 0.5m);
     }
     public decimal MoneyReceivedInBets { get; private set; }
     public decimal MoneyGivenInPrizes { get; private set; }
