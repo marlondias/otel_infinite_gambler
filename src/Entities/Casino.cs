@@ -1,9 +1,11 @@
 using System.Collections.Immutable;
+using Microsoft.Extensions.Logging;
 
 namespace InfiniteGambler.Entities;
 
-public class Casino
+public class Casino(ILogger<Casino> logger)
 {
+    private readonly ILogger<Casino> _logger = logger;
     public required string Name { get; init; }
     public required ImmutableArray<Game> Games { get; init; }
     public decimal PurchasePrice
@@ -28,6 +30,9 @@ public class Casino
         Games[gameIndex].IncrementBetsCount();
         player.SubtractFromCashBalance(Games[gameIndex].BetCost);
         MoneyReceivedInBets += Games[gameIndex].BetCost;
+        _logger.LogDebug(
+            $"A player placed a bet. PlayerName={player.Name} GameName={Games[gameIndex].Name} BetCost={Games[gameIndex].BetCost}."
+        );
 
         bool isWinner = Random.Shared.NextDouble() < Games[gameIndex].Odds;
         if (isWinner)
@@ -35,6 +40,9 @@ public class Casino
             Games[gameIndex].IncrementWinnersCount();
             MoneyGivenInPrizes += Games[gameIndex].Prize;
             player.AddCashBalance(Games[gameIndex].Prize);
+            _logger.LogDebug(
+                $"A player won a prize. PlayerName={player.Name} GameName={Games[gameIndex].Name} Prize={Games[gameIndex].Prize}."
+            );
         }
     }
 

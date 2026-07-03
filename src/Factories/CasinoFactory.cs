@@ -8,13 +8,14 @@ using InfiniteGambler.Entities;
 using Microsoft.Extensions.Logging;
 
 public sealed class CasinoFactory(
-    ILogger<CasinoFactory> logger,
+    ILoggerFactory loggerFactory,
     Faker faker,
     GameFactory gameFactory
 )
 {
     private static string[] _casinoSuffixes = ["Club", "Hall", "Lounge", "Palace"];
-    private readonly ILogger<CasinoFactory> _logger = logger;
+    private readonly ILogger<CasinoFactory> _logger = loggerFactory.CreateLogger<CasinoFactory>();
+    private readonly ILogger<Casino> _casinoLogger = loggerFactory.CreateLogger<Casino>();
     private readonly Faker _faker = faker;
     private readonly GameFactory _gameFactory = gameFactory;
 
@@ -25,7 +26,7 @@ public sealed class CasinoFactory(
             CasinoFactoryConstants.MaxAmountOfGames
         );
 
-        var casino = new Casino
+        var casino = new Casino(_casinoLogger)
         {
             Name = GenerateRandomName(),
             Games = _gameFactory.Create(amountOfGames).ToImmutableArray(),
