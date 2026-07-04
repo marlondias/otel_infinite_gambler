@@ -8,10 +8,7 @@ public class Casino(ILogger<Casino> logger)
     private readonly ILogger<Casino> _logger = logger;
     public required string Name { get; init; }
     public required ImmutableArray<Game> Games { get; init; }
-    public decimal PurchasePrice
-    {
-        get => Math.Round(Games.Sum(g => g.Prize) * 0.5m);
-    }
+    public required decimal PurchasePrice { get; init; }
     public decimal MoneyReceivedInBets { get; private set; }
     public decimal MoneyGivenInPrizes { get; private set; }
 

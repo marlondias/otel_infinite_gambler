@@ -25,11 +25,14 @@ public sealed class CasinoFactory(
             CasinoFactoryConstants.MinAmountOfGames,
             CasinoFactoryConstants.MaxAmountOfGames
         );
+        var games = _gameFactory.Create(amountOfGames).ToImmutableArray();
 
         var casino = new Casino(_casinoLogger)
         {
             Name = GenerateRandomName(),
-            Games = _gameFactory.Create(amountOfGames).ToImmutableArray(),
+            Games = games,
+            PurchasePrice =
+                CasinoFactoryConstants.BasePurchasePrice + (games.Sum(g => g.Prize) * 0.5m),
         };
 
         _logger.LogDebug($"A casino was created. {casino}");
