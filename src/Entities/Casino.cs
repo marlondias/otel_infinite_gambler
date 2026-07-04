@@ -27,9 +27,6 @@ public class Casino(ILogger<Casino> logger)
         Games[gameIndex].IncrementBetsCount();
         player.SubtractFromCashBalance(Games[gameIndex].BetCost);
         MoneyReceivedInBets += Games[gameIndex].BetCost;
-        _logger.LogDebug(
-            $"A player placed a bet. PlayerName={player.Name} GameName={Games[gameIndex].Name} BetCost={Games[gameIndex].BetCost}."
-        );
 
         bool isWinner = Random.Shared.NextDouble() < Games[gameIndex].Odds;
         if (isWinner)
