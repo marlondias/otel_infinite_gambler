@@ -1,25 +1,25 @@
 # The Infinite Gambler Simulator
 
-A simplified simulation of games of chance, random outcomes and gambling addiction.
+A simplified simulation of games of luck, random outcomes and gambling addiction.
 
 ## The simulation
 
 There are many gambling companies (`Casino` class), each providing diverse types of games of chance (`Game` class).
 
-Games have varying levels of difficulty (odds) and participation fees. 
+Games have varying levels of difficulty (odds) and participation fees.
 The prize is proportional to the cost and risk involved.
 The outcome of these games is always based on random chance, not influenced by skill or environment conditions.
 
-There is a single player (`Player` class), that dedicates all of his time and money to these games.
-His dream is to get rich and buy his own Casino.
+There are many players (`Player` class) who dedicate all of their time and money to these games.
+A player's dream is to get rich and buy his own Casino.
 
-The player starts with some amount of money, enough to cover some rounds of the cheapest bets.
-Whenever the player wins, the value of the prize will be instantly transfered to his account.
+Each player starts with some amount of money, enough to cover some rounds of betting.
+Whenever a player wins, the value of the prize will be instantly transfered to his account.
 
 The simulation will run for indeterminate amount of time, stopping only when either:
 
-- The player looses all his money.
-- The player has enough money to buy some of the casinos.
+- The players loose all of their money.
+- Some player has enough money to buy one of the casinos.
 
 ## The real goal
 
