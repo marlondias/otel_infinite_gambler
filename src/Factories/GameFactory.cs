@@ -56,7 +56,7 @@ public sealed class GameFactory(ILogger<GameFactory> logger, Faker faker)
             Prize = GenerateRandomPrize(odds),
         };
 
-        _logger.LogDebug($"A game was created. Name={game.Name} Prize={game.Prize}.");
+        _logger.LogDebug($"A game was created. {game}");
 
         return game;
     }

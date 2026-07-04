@@ -22,9 +22,7 @@ public sealed class PlayerFactory(ILogger<PlayerFactory> logger, Faker faker)
         );
         player.AddCashBalance(initialCash);
 
-        _logger.LogDebug(
-            $"A player was created. Name={player.Name} CashBalance={player.CashBalance}."
-        );
+        _logger.LogDebug($"A player was created. {player}");
 
         return player;
     }

@@ -32,9 +32,7 @@ public sealed class CasinoFactory(
             Games = _gameFactory.Create(amountOfGames).ToImmutableArray(),
         };
 
-        _logger.LogDebug(
-            $"A casino was created. Name={casino.Name} AmountOfGames={casino.Games.Length}."
-        );
+        _logger.LogDebug($"A casino was created. {casino}");
 
         return casino;
     }
