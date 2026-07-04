@@ -73,6 +73,16 @@ services:
     networks:
       - infinite_gambler_net
 
+  app:
+    build: .
+    container_name: ig_app
+    volumes:
+      - .:/app
+      - /app/bin
+      - /app/obj
+    networks:
+      - infinite_gambler_net
+
 volumes:
   loki_data:
   prometheus_data:

@@ -50,6 +50,10 @@ In other words, the Grafana dashboard is the "frontend" for this project.
 
 4) Edit the `.env` file, replacing the placeholder values.
 
-5) Run `docker compose up -d` and wait for the process to finish.
+5) Run `docker compose up --build -d` and wait for the process to finish.
 
-6) The app should be running. Access the [Grafana UI](http://localhost:3000) on your browser.
+6) To run a simulation use `docker exec -it ig_app dotnet run`.
+
+7) To see the telemetry for the simulation, access the [Grafana UI](http://localhost:3000) on your browser.
+
+> Note: You need to run the simulation at least once to see any data in Grafana.
