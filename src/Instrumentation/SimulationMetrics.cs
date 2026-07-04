@@ -5,13 +5,13 @@ namespace InfiniteGambler.Instrumentation;
 public sealed class SimulationMetrics
 {
     private readonly Counter<long> _simulationsStarted;
-    private readonly Histogram<double> _simulationDurationMs;
-    private readonly Histogram<double> _simulationRounds;
-    private readonly Histogram<long> _betsPlaced;
-    private readonly Histogram<long> _betsWon;
-    private readonly Histogram<double> _cheapestBetCost;
-    private readonly Histogram<double> _priceOfCheapestCasino;
-    private readonly Histogram<long> _amountOfGames;
+    private readonly Gauge<double> _simulationDurationMs;
+    private readonly Gauge<double> _simulationRounds;
+    private readonly Gauge<long> _betsPlaced;
+    private readonly Gauge<long> _betsWon;
+    private readonly Gauge<double> _cheapestBetCost;
+    private readonly Gauge<double> _priceOfCheapestCasino;
+    private readonly Gauge<long> _amountOfGames;
 
     public SimulationMetrics(IMeterFactory meterFactory)
     {
@@ -22,40 +22,40 @@ public sealed class SimulationMetrics
             description: "Number of simulations started"
         );
 
-        _simulationDurationMs = meter.CreateHistogram<double>(
+        _simulationDurationMs = meter.CreateGauge<double>(
             "simulation.duration",
             unit: "ms",
             description: "Duration of a full simulation run"
         );
 
-        _simulationRounds = meter.CreateHistogram<double>(
+        _simulationRounds = meter.CreateGauge<double>(
             "simulation.rounds",
             description: "Total rounds of a full simulation run"
         );
 
-        _betsPlaced = meter.CreateHistogram<long>(
+        _betsPlaced = meter.CreateGauge<long>(
             "simulation.bets.totalPlaced",
             description: "Number of game bets placed in a simulation."
         );
 
-        _betsWon = meter.CreateHistogram<long>(
+        _betsWon = meter.CreateGauge<long>(
             "simulation.bets.totalWon",
             description: "Number of game bets won in a simulation."
         );
 
-        _cheapestBetCost = meter.CreateHistogram<double>(
+        _cheapestBetCost = meter.CreateGauge<double>(
             "simulation.bets.cheapestCost",
             unit: "$",
             description: "Cost for betting on the cheapest game in a simulation."
         );
 
-        _priceOfCheapestCasino = meter.CreateHistogram<double>(
+        _priceOfCheapestCasino = meter.CreateGauge<double>(
             "simulation.cheapestCasino",
             unit: "$",
             description: "Price for purchasing the cheapest of all casinos in a simulation."
         );
 
-        _amountOfGames = meter.CreateHistogram<long>(
+        _amountOfGames = meter.CreateGauge<long>(
             "simulation.amountOfGames",
             description: "Number of games available in a simulation."
         );
