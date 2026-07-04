@@ -100,9 +100,11 @@ public sealed class GameFactory(ILogger<GameFactory> logger, Faker faker)
         var prizeDelta = GameFactoryConstants.MaxPrize - GameFactoryConstants.MinPrize;
         var minPrizeOffset = prizeDelta * (decimal)(1d - oddsRatio);
 
-        return _faker.Random.Decimal(
-            GameFactoryConstants.MinPrize + minPrizeOffset,
-            GameFactoryConstants.MaxPrize
+        return Math.Round(
+            _faker.Random.Decimal(
+                GameFactoryConstants.MinPrize + minPrizeOffset,
+                GameFactoryConstants.MaxPrize
+            )
         );
     }
 }
