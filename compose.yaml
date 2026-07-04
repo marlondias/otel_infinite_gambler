@@ -1,8 +1,9 @@
 services:
   otel_collector:
     image: otel/opentelemetry-collector-contrib:0.154.0
+    container_name: ig_otel_collector
     restart: unless-stopped
-    command: ["--config=/etc/otelcol-contrib/config.yaml"]
+    command: [ "--config=/etc/otelcol-contrib/config.yaml" ]
     ports:
       - "127.0.0.1:4317:4317" # OTLP gRPC receiver
       - "127.0.0.1:4318:4318" # OTLP HTTP receiver
@@ -14,6 +15,7 @@ services:
 
   loki:
     image: grafana/loki:3.7.3
+    container_name: ig_loki
     restart: unless-stopped
     user: "10001:10001" # Recommended non-root UID
     command:
@@ -29,6 +31,7 @@ services:
 
   prometheus:
     image: prom/prometheus:v3.12.0
+    container_name: ig_prometheus
     restart: unless-stopped
     command:
       - "--config.file=/etc/prometheus/prometheus.yaml"
@@ -49,6 +52,7 @@ services:
 
   grafana:
     image: grafana/grafana:13.0.2
+    container_name: ig_grafana
     restart: unless-stopped
     environment:
       GF_SECURITY_SECRET_KEY: "${GF_SECURITY_SECRET_KEY}"
